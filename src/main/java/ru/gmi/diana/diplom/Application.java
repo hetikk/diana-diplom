@@ -1,8 +1,11 @@
 package ru.gmi.diana.diplom;
 
-import javax.imageio.ImageIO;
+import ru.gmi.diana.diplom.foreshortening.ForeshorteningBuilder;
+import ru.gmi.diana.diplom.foreshortening.ForeshorteningType;
+import ru.gmi.diana.diplom.similarity.SimilarityUtils;
+
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.util.Map;
 
 public class Application {
 
@@ -12,11 +15,13 @@ public class Application {
         // синяя - z - depth
         // красная - x - width
 
-        Model model = Model.loadFromJson("models/2/plane01_70x15x78.json");
-        for (ForeshorteningType type : ForeshorteningType.values()) {
-            BufferedImage image = ForeshorteningBuilder.build(model, type, true);
-            ImageIO.write(image, "png", new File("models/2/foreshortening", type.name().toLowerCase() + ".png"));
-        }
+        Model donutModel = Model.loadFromJson("models/1/torus_100x28x100.json");
+        Map<ForeshorteningType, BufferedImage> donutImages = ForeshorteningBuilder.buildSet(donutModel, false);
+
+        Model planeModel = Model.loadFromJson("models/2/plane01_70x15x78.json");
+        Map<ForeshorteningType, BufferedImage> planeImages = ForeshorteningBuilder.buildSet(planeModel, false);
+
+        double similarity = SimilarityUtils.compare(donutImages, donutImages);
 
     }
 

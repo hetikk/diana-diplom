@@ -1,4 +1,4 @@
-package ru.gmi.diana.diplom;
+package ru.gmi.diana.diplom.foreshortening;
 
 public enum ForeshorteningType {
 
@@ -6,6 +6,6 @@ public enum ForeshorteningType {
     BACK,
     LEFT,
     RIGHT,
-    TOP;
+    TOP
 
 }

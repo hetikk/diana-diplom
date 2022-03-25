@@ -1,10 +1,13 @@
-package ru.gmi.diana.diplom;
+package ru.gmi.diana.diplom.foreshortening;
+
+import ru.gmi.diana.diplom.Model;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
 
 public class ForeshorteningBuilder {
 
@@ -87,10 +90,10 @@ public class ForeshorteningBuilder {
         return createImage(snapshot, monochrome);
     }
 
-    public static List<BufferedImage> buildSet(Model model, boolean monochrome) {
-        ArrayList<BufferedImage> images = new ArrayList<>();
+    public static Map<ForeshorteningType, BufferedImage> buildSet(Model model, boolean monochrome) {
+        Map<ForeshorteningType, BufferedImage> images = new HashMap<>();
         for (ForeshorteningType type : ForeshorteningType.values()) {
-            images.add(build(model, type, monochrome));
+            images.put(type, build(model, type, monochrome));
         }
         return images;
     }
