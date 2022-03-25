@@ -35,3 +35,5 @@ lombok.config
 **/out/
 **/build/
 *.class
+
+foreshortening
