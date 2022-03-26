@@ -1,11 +1,8 @@
 package ru.gmi.diana.diplom;
 
-import ru.gmi.diana.diplom.foreshortening.ForeshorteningBuilder;
-import ru.gmi.diana.diplom.foreshortening.ForeshorteningType;
-import ru.gmi.diana.diplom.similarity.SimilarityUtils;
+import ru.gmi.diana.diplom.clustering.Clustering;
 
-import java.awt.image.BufferedImage;
-import java.util.Map;
+import java.util.List;
 
 public class Application {
 
@@ -15,13 +12,28 @@ public class Application {
         // синяя - z - depth
         // красная - x - width
 
-        Model donutModel = Model.loadFromJson("models/1/torus_100x28x100.json");
-        Map<ForeshorteningType, BufferedImage> donutImages = ForeshorteningBuilder.buildSet(donutModel, false);
+        List<Model> models = Model.loadAllAsJson("models/all");
 
-        Model planeModel = Model.loadFromJson("models/2/plane01_70x15x78.json");
-        Map<ForeshorteningType, BufferedImage> planeImages = ForeshorteningBuilder.buildSet(planeModel, false);
+        final double separateValue = 0.6;
+        final boolean debug = true;
+        Clustering clustering = new Clustering(separateValue);
+        Clustering.Result result = clustering.clustering(models, debug);
 
-        double similarity = SimilarityUtils.compare(donutImages, donutImages);
+        if (debug) {
+            System.out.println("Models similarity:");
+            result.modelsSimilarity.forEach(System.out::println);
+
+            System.out.println("\nModels similarity after normalize:");
+            result.modelsSimilarity.forEach(System.out::println);
+
+            System.out.println("\nMST:");
+            result.mst.forEach(System.out::println);
+        }
+
+        System.out.println("\nClusters:");
+        for (int i = 0; i < result.clusters.size(); i++) {
+            System.out.printf("#%d: %s\n", i + 1, result.clusters.get(i));
+        }
 
     }
 

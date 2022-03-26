@@ -12,12 +12,13 @@ import java.util.Arrays;
 /**
  * Средний хэш для сравнения отпечатков изображений
  */
-public final class FingerPrint {
+public class FingerPrint {
 
     /**
      * Размер отпечатка пальца изображения, измените размер изображения до указанного размера, чтобы вычислить хеш-массив
      */
     private static final int HASH_SIZE = 16;
+
     /**
      * Матрица бинаризации, сохраняющая отпечатки пальцев изображения
      */
@@ -30,25 +31,22 @@ public final class FingerPrint {
         this.binaryzationMatrix = hashValue;
     }
 
-    public FingerPrint(String hashValue) {
-        this(toBytes(hashValue));
-    }
-
     public FingerPrint(BufferedImage src) {
         this(hashValue(src));
     }
 
     public static void main(String[] args) {
         try {
-            FingerPrint fp1 = new FingerPrint(ImageIO.read(new File(
-                    "models/1/foreshortening/back.png")));
-            FingerPrint fp2 = new FingerPrint(ImageIO.read(new File(
-                    "models/2/foreshortening/back.png")));
-            System.out.println(fp1.toString(true));
+            FingerPrint fp1 = new FingerPrint(ImageIO.read(new File("models/1/foreshortening/back.png")));
+            FingerPrint fp2 = new FingerPrint(ImageIO.read(new File("models/2/foreshortening/back.png")));
             System.out.printf("sim=%f", fp1.compare(fp2));
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static double compare(BufferedImage image1, BufferedImage image2) {
+        return new FingerPrint(image1).compare(new FingerPrint(image2));
     }
 
     private static byte[] hashValue(BufferedImage src) {
@@ -59,40 +57,23 @@ public final class FingerPrint {
     }
 
     /**
-     * Создавайте объекты {@link FingerPrint} из сжатых отпечатков пальцев
+     * Оцените схожесть двух массивов, длина массива должна быть одинаковой, иначе будет выдано исключение
      *
-     * @param compactValue
-     * @return
+     * @return Возвращает сходство (0,0 ~ 1,0)
      */
-    public static FingerPrint createFromCompact(byte[] compactValue) {
-        return new FingerPrint(uncompact(compactValue));
-    }
-
-    public static boolean validHashValue(byte[] hashValue) {
-        if (hashValue.length != HASH_SIZE)
-            return false;
-        for (byte b : hashValue) {
-            if (0 != b && 1 != b)
-                return false;
+    private static float compare(byte[] f1, byte[] f2) {
+        if (f1.length != f2.length)
+            throw new IllegalArgumentException("mismatch FingerPrint length");
+        int sameCount = 0;
+        for (int i = 0; i < f1.length; ++i) {
+            if (f1[i] == f2[i])
+                ++sameCount;
         }
-        return true;
-    }
-
-    public static boolean validHashValue(String hashValue) {
-        if (hashValue.length() != HASH_SIZE)
-            return false;
-        for (int i = 0; i < hashValue.length(); ++i) {
-            if ('0' != hashValue.charAt(i) && '1' != hashValue.charAt(i))
-                return false;
-        }
-        return true;
+        return (float) sameCount / f1.length;
     }
 
     /**
      * Битовое сжатие данных отпечатка пальца
-     *
-     * @param hashValue
-     * @return
      */
     private static byte[] compact(byte[] hashValue) {
         byte[] result = new byte[(hashValue.length + 7) >> 3];
@@ -115,9 +96,6 @@ public final class FingerPrint {
 
     /**
      * Распакуйте отпечатки пальцев в сжатом формате
-     *
-     * @param compactValue
-     * @return
      */
     private static byte[] uncompact(byte[] compactValue) {
         byte[] result = new byte[compactValue.length << 3];
@@ -132,9 +110,6 @@ public final class FingerPrint {
 
     /**
      * Преобразование данных отпечатка пальца строкового типа в байтовый массив
-     *
-     * @param hashValue
-     * @return
      */
     private static byte[] toBytes(String hashValue) {
         hashValue = hashValue.replaceAll("\\s", "");
@@ -153,11 +128,6 @@ public final class FingerPrint {
 
     /**
      * Масштабировать изображение до указанного размера
-     *
-     * @param src
-     * @param width
-     * @param height
-     * @return
      */
     private static BufferedImage resize(Image src, int width, int height) {
         BufferedImage result = new BufferedImage(width, height,
@@ -175,9 +145,6 @@ public final class FingerPrint {
 
     /**
      * Рассчитать среднее значение
-     *
-     * @param src
-     * @return
      */
     private static int mean(byte[] src) {
         long sum = 0;
@@ -188,9 +155,6 @@ public final class FingerPrint {
 
     /**
      * Обработка бинаризации
-     *
-     * @param src
-     * @return
      */
     private static byte[] binaryzation(byte[] src) {
         byte[] dst = src.clone();
@@ -204,9 +168,6 @@ public final class FingerPrint {
 
     /**
      * К изображению в оттенках серого
-     *
-     * @param src
-     * @return
      */
     private static BufferedImage toGray(BufferedImage src) {
         if (src.getType() == BufferedImage.TYPE_BYTE_GRAY) {
@@ -221,53 +182,13 @@ public final class FingerPrint {
     }
 
     /**
-     * Оцените схожесть двух массивов, длина массива должна быть одинаковой, иначе будет выдано исключение
-     *
-     * @param f1
-     * @param f2
-     * @Return Возвращает сходство (0,0 ~ 1,0)
+     * Сравнить сходство отпечатков пальцев
      */
-    private static float compare(byte[] f1, byte[] f2) {
-        if (f1.length != f2.length)
-            throw new IllegalArgumentException("mismatch FingerPrint length");
-        int sameCount = 0;
-        for (int i = 0; i < f1.length; ++i) {
-            if (f1[i] == f2[i])
-                ++sameCount;
-        }
-        return (float) sameCount / f1.length;
-    }
-
-    public static float compareCompact(byte[] f1, byte[] f2) {
-        return compare(uncompact(f1), uncompact(f2));
-    }
-
-    public static float compare(BufferedImage image1, BufferedImage image2) {
-        return new FingerPrint(image1).compare(new FingerPrint(image2));
-    }
-
-    public byte[] compact() {
-        return compact(binaryzationMatrix);
-    }
-
-    @Override
-    public String toString() {
-        return toString(true);
-    }
-
-    /**
-     * @param multiLine Это ветка?
-     * @return
-     */
-    public String toString(boolean multiLine) {
-        StringBuffer buffer = new StringBuffer();
-        int count = 0;
-        for (byte b : this.binaryzationMatrix) {
-            buffer.append(0 == b ? '0' : '1');
-            if (multiLine && ++count % HASH_SIZE == 0)
-                buffer.append('\n');
-        }
-        return buffer.toString();
+    public double compare(FingerPrint src) {
+        if (src.binaryzationMatrix.length != this.binaryzationMatrix.length)
+            throw new IllegalArgumentException(
+                    "length of hashValue is mismatch");
+        return compare(binaryzationMatrix, src.binaryzationMatrix);
     }
 
     @Override
@@ -279,59 +200,4 @@ public final class FingerPrint {
             return super.equals(obj);
     }
 
-    /**
-     * Сравните сходство с указанным отпечатком формата сжатия
-     *
-     * @param compactValue
-     * @return
-     * @see #compare(FingerPrint)
-     */
-    public float compareCompact(byte[] compactValue) {
-        return compare(createFromCompact(compactValue));
-    }
-
-    /**
-     * @param hashValue
-     * @return
-     * @see #compare(FingerPrint)
-     */
-    public float compare(String hashValue) {
-        return compare(new FingerPrint(hashValue));
-    }
-
-    /**
-     * Сравните сходство с указанным отпечатком пальца
-     *
-     * @param hashValue
-     * @return
-     * @see #compare(FingerPrint)
-     */
-    public float compare(byte[] hashValue) {
-        return compare(new FingerPrint(hashValue));
-    }
-
-    /**
-     * Сравните сходство с указанным изображением
-     *
-     * @param image2
-     * @return
-     * @see #compare(FingerPrint)
-     */
-    public float compare(BufferedImage image2) {
-        return compare(new FingerPrint(image2));
-    }
-
-    /**
-     * Сравнить сходство отпечатков пальцев
-     *
-     * @param src
-     * @return
-     * @see #compare(byte[], byte[])
-     */
-    public float compare(FingerPrint src) {
-        if (src.binaryzationMatrix.length != this.binaryzationMatrix.length)
-            throw new IllegalArgumentException(
-                    "length of hashValue is mismatch");
-        return compare(binaryzationMatrix, src.binaryzationMatrix);
-    }
 }

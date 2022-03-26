@@ -79,21 +79,21 @@ public class ForeshorteningBuilder {
         }
     }
 
-    public static BufferedImage build(Model model, ForeshorteningType type, boolean monochrome) {
+    public static BufferedImage build(Model model, ForeshorteningType type, boolean monochrome, boolean print) {
         int depth = model.dimensions.get(0).depth;
         int height = model.dimensions.get(0).height;
         int width = model.dimensions.get(0).width;
 
         Integer[][] snapshot = handlers.get(type).makeSnapshot(model.voxels, width, height, depth);
-        printLayer(snapshot);
+        if (print) printLayer(snapshot);
 
         return createImage(snapshot, monochrome);
     }
 
-    public static Map<ForeshorteningType, BufferedImage> buildSet(Model model, boolean monochrome) {
+    public static Map<ForeshorteningType, BufferedImage> buildSet(Model model, boolean monochrome, boolean print) {
         Map<ForeshorteningType, BufferedImage> images = new HashMap<>();
         for (ForeshorteningType type : ForeshorteningType.values()) {
-            images.put(type, build(model, type, monochrome));
+            images.put(type, build(model, type, monochrome, print));
         }
         return images;
     }
@@ -133,8 +133,8 @@ public class ForeshorteningBuilder {
     }
 
     private static void printLayer(Integer[][] layer) {
-        for (int y = 0; y < layer.length; y++) {
-            String s = Arrays.toString(layer[y]).replaceAll("(null|,|]|\\[)", " ");
+        for (Integer[] integers : layer) {
+            String s = Arrays.toString(integers).replaceAll("(null|,|]|\\[)", " ");
             System.out.println(s);
         }
     }

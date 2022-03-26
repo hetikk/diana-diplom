@@ -17,10 +17,10 @@ import java.io.InputStream;
  */
 public class ImagePHash {
 
-    private int size = 32;
-    private int smallerSize = 8;
     private final ColorConvertOp colorConvert = new ColorConvertOp(
             ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
+    private int size = 32;
+    private int smallerSize = 8;
     private double[] c;
 
     public ImagePHash() {
@@ -44,14 +44,10 @@ public class ImagePHash {
         String image1;
         String image2;
         try {
-            image1 = p.getHash(new FileInputStream(new File(
-                    "models/1/foreshortening/back.png")));
-            image2 = p.getHash(new FileInputStream(new File(
-                    "models/1/foreshortening/back.png")));
+            image1 = p.getHash(new FileInputStream("models/1/foreshortening/back.png"));
+            image2 = p.getHash(new FileInputStream("models/2/foreshortening/back.png"));
             System.out.println("1:1 Score is " + p.distance(image1, image2));
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -135,17 +131,17 @@ public class ImagePHash {
          * long as the overall structure of the image remains the same; this can
          * survive gamma and color histogram adjustments without a problem.
          */
-        String hash = "";
+        StringBuilder hash = new StringBuilder();
 
         for (int x = 0; x < smallerSize; x++) {
             for (int y = 0; y < smallerSize; y++) {
                 if (x != 0 && y != 0) {
-                    hash += (dctVals[x][y] > avg ? "1" : "0");
+                    hash.append(dctVals[x][y] > avg ? "1" : "0");
                 }
             }
         }
 
-        return hash;
+        return hash.toString();
     }
 
     // DCT function stolen from
