@@ -1,7 +1,5 @@
 package ru.gmi.diana.diplom.foreshortening;
 
-import ru.gmi.diana.diplom.Model;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;

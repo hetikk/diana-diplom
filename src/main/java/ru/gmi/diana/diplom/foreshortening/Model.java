@@ -1,4 +1,4 @@
-package ru.gmi.diana.diplom;
+package ru.gmi.diana.diplom.foreshortening;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
@@ -36,13 +36,12 @@ public class Model {
         return model;
     }
 
-    public static List<Model> loadAllAsJson(String path) throws IOException {
-        File[] files = new File(path).listFiles();
-        List<Model> models = new ArrayList<>();
-        for (File file : Objects.requireNonNull(files)) {
-            models.add(loadAsJson(file.getAbsolutePath()));
+    public static List<Model> loadAsJson(File[] models) throws IOException {
+        List<Model> modelList = new ArrayList<>();
+        for (File file : Objects.requireNonNull(models)) {
+            modelList.add(loadAsJson(file.getAbsolutePath()));
         }
-        return models;
+        return modelList;
     }
 
     public static class Dimension {

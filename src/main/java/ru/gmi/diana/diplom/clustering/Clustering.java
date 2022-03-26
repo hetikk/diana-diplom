@@ -1,17 +1,19 @@
 package ru.gmi.diana.diplom.clustering;
 
-import ru.gmi.diana.diplom.Model;
+import ru.gmi.diana.diplom.foreshortening.Model;
 import ru.gmi.diana.diplom.foreshortening.ForeshorteningBuilder;
 import ru.gmi.diana.diplom.foreshortening.ForeshorteningType;
 import ru.gmi.diana.diplom.similarity.ImageSimilarity;
 
 import java.awt.image.BufferedImage;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class Clustering {
 
-    private double separateValue;
+    private final double separateValue;
 
     private double[][] similarityMatrix;
 
@@ -20,6 +22,8 @@ public class Clustering {
     }
 
     public Result clustering(List<Model> models, boolean debug) {
+        Instant start = Instant.now();
+
         final Result result = new Result();
         this.similarityMatrix = new double[models.size()][models.size()];
 
@@ -84,6 +88,9 @@ public class Clustering {
                         .collect(Collectors.toList()))
                 .collect(Collectors.toList());
 
+        Instant finish = Instant.now();
+        result.time = Duration.between(start, finish).toMillis();
+
         return result;
     }
 
@@ -114,6 +121,7 @@ public class Clustering {
         public List<String> mst;
         public List<String> modelsSimilarity;
         public List<String> modelsSimilarityAfterNormalize;
+        public long time;
     }
 
 }
