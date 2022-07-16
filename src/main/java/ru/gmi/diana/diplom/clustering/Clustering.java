@@ -90,7 +90,7 @@ public class Clustering {
 
         Instant finish = Instant.now();
         result.time = Duration.between(start, finish).toMillis();
-
+        System.out.println();
         return result;
     }
 
